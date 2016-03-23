@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+def execute!(command)
+  STDERR.puts "\e[35;1m#{command}\e[0m"
+  system command
+  raise "!" unless $?.to_i == 0
+end
+
+def vagrant_execute!(vm, command)
+  execute! "vagrant ssh #{vm} -c '#{command}'"
+end
+
+PLATFORMS = %w(debian8)
+RUBIES = %w(2.2.1 jruby-1.7.19)
+
+PLATFORMS.each do |platform|
+  vm_name = "ruby-prebuild-#{platform}"
+
+  execute! "vagrant up #{vm_name}"
+
+  RUBIES.each do |ruby_version|
+    ruby_path = "/usr/local/ruby/#{ruby_version}"
+    tarred_ruby = "~/built_rubies/built_ruby-#{platform}-#{ruby_version}.tar.bz2"
+
+    vagrant_execute!(vm_name, "sudo ruby-build #{ruby_version} #{ruby_path}")
+    vagrant_execute!(vm_name, "mkdir -p ~/built_rubies && rm -f #{tarred_ruby} && tar cjf #{tarred_ruby} #{ruby_path}")
+  end
+
+  execute! "vagrant ssh-config > .vagrant/vagrant-ssh-config"
+  execute! "mkdir -p built_rubies && scp -F .vagrant/vagrant-ssh-config #{vm_name}:built_rubies/* built_rubies/"
+  execute! "sha256sum -b built_rubies/* > built_rubies/sha256"
+
+  execute! "vagrant halt #{vm_name}"
+end
