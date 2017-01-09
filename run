@@ -11,7 +11,7 @@ def vagrant_execute!(vm, command)
 end
 
 PLATFORMS = %w(debian8)
-RUBIES = %w(2.2.1 jruby-1.7.19)
+RUBIES = %w(2.2.1 2.3.3 jruby-1.7.19)
 
 PLATFORMS.each do |platform|
   vm_name = "ruby-prebuild-#{platform}"
@@ -23,6 +23,7 @@ PLATFORMS.each do |platform|
     tarred_ruby = "~/built_rubies/built_ruby-#{platform}-#{ruby_version}.tar.bz2"
 
     vagrant_execute!(vm_name, "sudo ruby-build #{ruby_version} #{ruby_path}")
+    vagrant_execute!(vm_name, "sudo chmod -R a+rx #{ruby_path}")
     vagrant_execute!(vm_name, "mkdir -p ~/built_rubies && rm -f #{tarred_ruby} && tar cjf #{tarred_ruby} #{ruby_path}")
   end
 
