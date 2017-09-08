@@ -17,12 +17,12 @@ PLATFORMS.each do |platform|
   vm_name = "ruby-prebuild-#{platform}"
 
   execute! "vagrant up #{vm_name}"
+  vagrant_execute!(vm_name, 'sudo bash -c "cd ruby-build && git pull && ./install.sh"')
 
   RUBIES.each do |ruby_version|
     ruby_path = "/usr/local/ruby/#{ruby_version}"
     tarred_ruby = "~/built_rubies/built_ruby-#{platform}-#{ruby_version}.tar.bz2"
 
-    vagrant_execute!(vm_name, 'sudo bash -c "cd ruby-build && git pull && ./install.sh"')
     vagrant_execute!(vm_name, "sudo ruby-build #{ruby_version} #{ruby_path}")
     vagrant_execute!(vm_name, "sudo chmod -R a+rx #{ruby_path}")
     vagrant_execute!(vm_name, "mkdir -p ~/built_rubies && rm -f #{tarred_ruby} && tar cjf #{tarred_ruby} #{ruby_path}")
