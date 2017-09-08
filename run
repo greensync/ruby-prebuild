@@ -30,7 +30,7 @@ PLATFORMS.each do |platform|
 
   execute! "vagrant ssh-config > .vagrant/vagrant-ssh-config"
   execute! "mkdir -p built_rubies && scp -F .vagrant/vagrant-ssh-config #{vm_name}:built_rubies/* built_rubies/"
-  execute! "sha256sum -b built_rubies/* > built_rubies/sha256"
+  execute! "sha256sum -b built_rubies/* > built_rubies/sha256 || echo 'Failed running sha256sum'"
 
   execute! "vagrant halt #{vm_name}"
 end
