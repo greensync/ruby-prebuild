@@ -11,7 +11,7 @@ def vagrant_execute!(vm, command)
 end
 
 PLATFORMS = %w(debian8)
-RUBIES = %w(2.3.4 jruby-9.1.12.0)
+RUBIES = %w(2.3.4 2.5.3 jruby-9.1.12.0 jruby-9.2.6.0)
 
 PLATFORMS.each do |platform|
   vm_name = "ruby-prebuild-#{platform}"
